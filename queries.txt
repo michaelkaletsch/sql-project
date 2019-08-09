@@ -1,0 +1,123 @@
+Question #1 / Slide #1:
+
+Question: What are the 10 family movies with its associated film category that were rented most often?
+
+SQL Query:
+
+SELECT
+  f.title film_title,
+  c.name category_name,
+  COUNT(r.rental_id) rental_count
+FROM film f
+JOIN film_category fc
+  ON f.film_id = fc.film_id
+JOIN category c
+  ON c.category_id = fc.category_id
+JOIN inventory i
+  ON f.film_id = i.film_id
+JOIN rental r
+  ON i.inventory_id = r.inventory_id
+GROUP BY film_title,
+         category_name
+HAVING c.name = 'Animation'
+OR c.name = 'Children'
+OR c.name = 'Classics'
+OR c.name = 'Comedy'
+OR c.name = 'Family'
+OR c.name = 'Music'
+ORDER BY rental_count DESC, category_name
+LIMIT 10
+
+
+
+
+Question #2 / Slide #2:
+
+Question: What are the 10 family movies with its associated film category and rental duration quartile with the longest rental duration?
+
+SQL Query:
+
+SELECT
+  f.title film_title,
+  c.name category_name,
+  f.rental_duration,
+  NTILE(4) OVER (ORDER BY rental_duration) AS duration_quartile
+FROM film f
+JOIN film_category fc
+  ON f.film_id = fc.film_id
+JOIN category c
+  ON c.category_id = fc.category_id
+WHERE c.name = 'Animation'
+OR c.name = 'Children'
+OR c.name = 'Classics'
+OR c.name = 'Comedy'
+OR c.name = 'Family'
+OR c.name = 'Music'
+ORDER BY rental_duration DESC
+LIMIT 10
+
+
+
+
+Question #3 / Slide #3:
+
+Question: How many movies were rented in each rental quartile and its associated film category for the 10 most often rented movies?
+
+SQL Query:
+
+WITH t1
+AS (SELECT
+  c.name category_name,
+  NTILE(4) OVER (ORDER BY rental_duration) AS duration_quartile,
+  f.film_id
+FROM film f
+JOIN film_category fc
+  ON f.film_id = fc.film_id
+JOIN category c
+  ON c.category_id = fc.category_id
+WHERE c.name = 'Animation'
+OR c.name = 'Children'
+OR c.name = 'Classics'
+OR c.name = 'Comedy'
+OR c.name = 'Family'
+OR c.name = 'Music')
+
+SELECT
+  category_name,
+  duration_quartile,
+  COUNT(film_id) film_count
+FROM t1
+GROUP BY category_name,
+         duration_quartile
+ORDER BY film_count DESC
+LIMIT 10
+
+
+
+
+Question #4 / Slide #4:
+
+Question: How do the two stores compare regarding their rental orders during the months of available years?
+
+SQL Query:
+
+SELECT
+  rental_month,
+  rental_year,
+  store_id,
+  COUNT(rental_id) rental_count
+FROM (SELECT
+  DATE_PART('month', r.rental_date) rental_month,
+  DATE_PART('year', r.rental_date) rental_year,
+  s.store_id,
+  r.rental_id
+FROM rental r
+JOIN staff s
+  ON s.staff_id = r.staff_id) t1
+GROUP BY rental_month,
+         rental_year,
+         store_id
+ORDER BY rental_count DESC
+
+
+

@@ -11,7 +11,7 @@ Exploration of the Sakila DVD Rental database related to movie rentals with SQL.
    
       
 **Files used in project:**
-- dvdrental.tar (Sakila DVD Rental database)
-- queries.txt (file with SQL codes and comments)
+- dvdrental.tar (Sakila DVD rental database)
+- queries.txt (file with SQL code and comments)
 - report.pdf (visualizations and result summary)
 - report.pptx (visualizations and result summary)
